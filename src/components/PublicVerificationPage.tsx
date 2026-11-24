@@ -50,7 +50,7 @@ const StarRatingRow: React.FC<{
   const [hovered, setHovered] = useState<number | null>(null);
 
   const getLabel = (score: number | null) => {
-    if (score === null) return 'Not Observed';
+    if (score === null) return 'Select Rating';
     if (score === 5) return 'Highly Satisfied';
     if (score === 4) return 'Satisfied';
     if (score === 3) return 'Neutral';
@@ -71,16 +71,16 @@ const StarRatingRow: React.FC<{
         </span>
         <span
           className={`text-[9.5px] font-bold px-2.5 py-0.5 rounded-full border self-start sm:self-auto backdrop-blur-sm ${
-            value === null
-              ? 'bg-white/10 text-white/90 border-white/20'
-              : value >= 4
+            activeRating === null
+              ? 'bg-white/10 text-white/70 border-white/20'
+              : activeRating >= 4
               ? 'bg-emerald-500/35 text-emerald-200 border-emerald-400/60 shadow-[0_0_10px_rgba(16,185,129,0.35)]'
-              : value === 3
+              : activeRating === 3
               ? 'bg-amber-500/35 text-amber-200 border-amber-400/60'
               : 'bg-rose-500/35 text-rose-200 border-rose-400/60'
           }`}
         >
-          {getLabel(value)} {value !== null ? `(${value}/5)` : ''}
+          {getLabel(activeRating)} {activeRating !== null ? `(${activeRating}/5)` : ''}
         </span>
       </div>
 
@@ -212,21 +212,19 @@ export const PublicVerificationPage: React.FC<PublicVerificationPageProps> = ({
   const [rehireEligibility, setRehireEligibility] = useState<'Eligible' | 'Not eligible' | 'Not sure'>('Eligible');
   const [remarks, setRemarks] = useState('');
 
-  // 5 Behavioural Questions (Scores 1-5 or null)
-  const [q1, setQ1] = useState<number | null>(5);
-  const [q2, setQ2] = useState<number | null>(4);
-  const [q3, setQ3] = useState<number | null>(5);
-  const [q4, setQ4] = useState<number | null>(4);
-  const [q5, setQ5] = useState<number | null>(5);
-  const [behaviouralComment, setBehaviouralComment] = useState(
-    'Demonstrated high ownership on tight deliverable deadlines and managed stakeholder expectations effectively.'
-  );
+  // 5 Behavioural Questions (Scores 1-5 or null; defaults to null so no stars are pre-highlighted)
+  const [q1, setQ1] = useState<number | null>(null);
+  const [q2, setQ2] = useState<number | null>(null);
+  const [q3, setQ3] = useState<number | null>(null);
+  const [q4, setQ4] = useState<number | null>(null);
+  const [q5, setQ5] = useState<number | null>(null);
+  const [behaviouralComment, setBehaviouralComment] = useState('');
 
-  const [verifierName, setVerifierName] = useState('Pooja Kulkarni');
-  const [verifierDesignation, setVerifierDesignation] = useState('Lead HR Operations');
+  const [verifierName, setVerifierName] = useState('');
+  const [verifierDesignation, setVerifierDesignation] = useState('');
   const [verifierEmail, setVerifierEmail] = useState(matchedRequest?.previousEmail || '');
-  const [verifierPhone, setVerifierPhone] = useState('+91 98201 54321');
-  const [consentChecked, setConsentChecked] = useState(true);
+  const [verifierPhone, setVerifierPhone] = useState('');
+  const [consentChecked, setConsentChecked] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(matchedRequest?.status === 'Responded');
 
   // Document PDF Viewer State
