@@ -4,7 +4,7 @@ import { supabase } from '../lib/supabase';
 const STORAGE_KEY = 'netbounce_bgv_requests';
 
 // Convert DB snake_case row to frontend BGVRequest
-function rowToRequest(row: any): BGVRequest {
+export function rowToRequest(row: any): BGVRequest {
   return {
     id: row.id,
     token: row.token,
@@ -101,6 +101,110 @@ export function setStoredRequests(requests: BGVRequest[]): void {
     }
   } catch (e) {
     console.error('Failed to store requests:', e);
+  }
+}
+
+// Fetch single request by token directly from Supabase
+export async function fetchRequestByToken(token: string): Promise<BGVRequest | null> {
+  if (!token) return null;
+  try {
+    const { data, error } = await supabase
+      .from('bgv_requests')
+      .select('*')
+      .eq('token', token)
+      .maybeSingle();
+
+    if (!error && data) {
+      return rowToRequest(data);
+    }
+  } catch (err) {
+    console.warn('Error fetching request by token:', err);
+  }
+  return null;
+}
+
+// Mark request as Opened in Supabase
+export async function markRequestAsOpened(token: string): Promise<BGVRequest | null> {
+  if (!token) return null;
+  try {
+    const now = new Date();
+    const formatted =
+      now.toLocaleDateString([], { day: '2-digit', month: 'short', year: 'numeric' }) +
+      ' ' +
+      now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    const { data, error } = await supabase
+      .from('bgv_requests')
+      .update({
+        status: 'Opened',
+        opened_at: formatted,
+      })
+      .eq('token', token)
+      .eq('status', 'Sent')
+      .select()
+      .maybeSingle();
+
+    if (!error && data) {
+      const converted = rowToRequest(data);
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        try {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) {
+            const updated = parsed.map((r: BGVRequest) => (r.id === converted.id ? converted : r));
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+            window.dispatchEvent(new Event('bgv-requests-updated'));
+          }
+        } catch {}
+      }
+      return converted;
+    }
+  } catch (err) {
+    console.warn('Error marking request as opened:', err);
+  }
+  return null;
+}
+
+// Submit employer verification response to Supabase
+export async function submitVerificationResponse(
+  requestId: string,
+  responseData: NonNullable<BGVRequest['responseDetails']>
+): Promise<boolean> {
+  try {
+    const respondedAt = responseData.submittedAt || new Date().toISOString();
+    const { error } = await supabase
+      .from('bgv_requests')
+      .update({
+        status: 'Responded',
+        responded_at: respondedAt,
+        response_details: responseData,
+      })
+      .eq('id', requestId);
+
+    if (error) {
+      console.error('Supabase response update error:', error.message);
+      return false;
+    }
+
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      try {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          const updated = parsed.map((r: BGVRequest) =>
+            r.id === requestId
+              ? { ...r, status: 'Responded' as const, respondedAt, responseDetails: responseData }
+              : r
+          );
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+          window.dispatchEvent(new Event('bgv-requests-updated'));
+        }
+      } catch {}
+    }
+    return true;
+  } catch (err) {
+    console.error('Exception submitting verification response:', err);
+    return false;
   }
 }
 

@@ -85,26 +85,26 @@ export const RequestDetailDrawer: React.FC<RequestDetailDrawerProps> = ({
                 {/* Opened */}
                 <div className="flex items-start gap-3 relative">
                   <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 z-10 ${
-                    request.openedAt ? 'bg-amber-500 text-white' : 'bg-slate-100 text-slate-400 border border-slate-300'
+                    request.openedAt || request.status === 'Opened' || request.status === 'Responded' ? 'bg-amber-500 text-white' : 'bg-slate-100 text-slate-400 border border-slate-300'
                   }`}>
                     <Eye className="w-3 h-3" />
                   </div>
                   <div>
                     <p className="text-xs font-bold text-slate-800">Link Opened by Verifier</p>
-                    <p className="text-[11px] font-medium text-slate-500">{request.openedAt || 'Not opened yet'}</p>
+                    <p className="text-[11px] font-medium text-slate-500">{request.openedAt || (request.status === 'Responded' || request.status === 'Opened' ? 'Opened & Inspected' : 'Not opened yet')}</p>
                   </div>
                 </div>
 
                 {/* Responded */}
                 <div className="flex items-start gap-3 relative">
                   <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 z-10 ${
-                    request.respondedAt ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-500/30' : 'bg-slate-100 text-slate-400 border border-slate-300'
+                    request.respondedAt || request.status === 'Responded' ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-500/30' : 'bg-slate-100 text-slate-400 border border-slate-300'
                   }`}>
                     <CheckCircle className="w-3 h-3" />
                   </div>
                   <div>
                     <p className="text-xs font-bold text-slate-800">Employer Verified & Submitted</p>
-                    <p className="text-[11px] font-medium text-slate-500">{request.respondedAt || 'Awaiting response'}</p>
+                    <p className="text-[11px] font-medium text-slate-500">{request.respondedAt || (request.status === 'Responded' ? 'Response Recorded' : 'Awaiting response')}</p>
                   </div>
                 </div>
               </div>
@@ -236,6 +236,15 @@ export const RequestDetailDrawer: React.FC<RequestDetailDrawerProps> = ({
                     <p><strong>Contact:</strong> {request.responseDetails.verifierEmail} | {request.responseDetails.verifierPhone}</p>
                     <p className="text-slate-500 font-mono text-[10px]">Submitted at: {request.responseDetails.submittedAt}</p>
                   </div>
+
+                  <button
+                    type="button"
+                    onClick={() => onDownloadResponsePDF(request)}
+                    className="w-full mt-3 py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm transition-all cursor-pointer"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    <span>Download Official Verified PDF</span>
+                  </button>
                 </div>
               </div>
             )}

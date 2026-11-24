@@ -17,6 +17,8 @@ import {
   saveUserToSupabase,
   deleteUserFromSupabase,
   deleteStoredRequest,
+  submitVerificationResponse,
+  markRequestAsOpened,
 } from './utils/storage';
 import { DeleteConfirmationModal } from './components/DeleteConfirmationModal';
 import confetti from 'canvas-confetti';
@@ -87,6 +89,12 @@ export function App() {
     const unsubscribeRealtime = subscribeToSupabaseRealtime(
       (updated) => {
         setRequests(updated);
+        // Automatically sync drawer if currently open
+        setSelectedRequest((prev) => {
+          if (!prev) return null;
+          const fresh = updated.find((r) => r.id === prev.id);
+          return fresh || prev;
+        });
       },
       (updatedUsers) => {
         setUsers(updatedUsers.length > 0 ? updatedUsers : initialUsers);
@@ -106,26 +114,25 @@ export function App() {
     const handleStorageSync = () => {
       const latest = getStoredRequests();
       setRequests(latest);
+      setSelectedRequest((prev) => {
+        if (!prev) return null;
+        const fresh = latest.find((r) => r.id === prev.id);
+        return fresh || prev;
+      });
     };
 
     window.addEventListener('storage', handleStorageSync);
     window.addEventListener('bgv-requests-updated', handleStorageSync);
 
-    // 4. If accessing via verification token and currently 'Sent', auto-mark 'Opened'
+    // 4. If accessing via verification token and currently 'Sent', auto-mark 'Opened' in DB
     if (verifyToken) {
-      const target = stored.find((r) => r.token === verifyToken);
-      if (target && target.status === 'Sent') {
-        const openedTime =
-          new Date().toLocaleDateString([], { day: '2-digit', month: 'short' }) +
-          ' ' +
-          new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-        const updated = stored.map((r) =>
-          r.id === target.id ? { ...r, status: 'Opened' as const, openedAt: openedTime } : r
-        );
-        setStoredRequests(updated);
-        setRequests(updated);
-      }
+      markRequestAsOpened(verifyToken).then((openedReq) => {
+        if (openedReq) {
+          const latest = getStoredRequests();
+          const updated = latest.map((r) => (r.id === openedReq.id ? openedReq : r));
+          setRequests(updated);
+        }
+      });
     }
 
     return () => {
@@ -357,11 +364,15 @@ export function App() {
     }
   };
 
-  // 4. Submit Employer Response (Stores All Data & Behavioural Ratings in Real Time)
-  const handleSubmitEmployerResponse = (
+  // 4. Submit Employer Response (Stores All Data & Behavioural Ratings in Real Time to DB)
+  const handleSubmitEmployerResponse = async (
     requestId: string,
     responseData: NonNullable<BGVRequest['responseDetails']>
   ) => {
+    // 1. Submit directly to Supabase PostgreSQL database
+    await submitVerificationResponse(requestId, responseData);
+
+    // 2. Update local state and persistent storage
     const latest = getStoredRequests();
     const updated = latest.map((r) => {
       if (r.id === requestId) {
@@ -377,6 +388,15 @@ export function App() {
 
     setStoredRequests(updated);
     setRequests(updated);
+    setSelectedRequest((prev) => {
+      if (!prev || prev.id !== requestId) return prev;
+      return {
+        ...prev,
+        status: 'Responded' as const,
+        respondedAt: responseData.submittedAt,
+        responseDetails: responseData,
+      };
+    });
     showToast(`Employer verification submitted: ${responseData.confirmed ? 'Confirmed Positive' : 'Discrepancy Noted'}`);
   };
 

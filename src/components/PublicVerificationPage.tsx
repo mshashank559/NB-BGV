@@ -24,6 +24,11 @@ import {
   generateExperienceLetterBlobUrl,
   downloadExperienceLetterPDF,
 } from '../utils/pdfGenerator';
+import {
+  fetchRequestByToken,
+  markRequestAsOpened,
+  submitVerificationResponse,
+} from '../utils/storage';
 
 interface PublicVerificationPageProps {
   token: string;
@@ -136,8 +141,50 @@ export const PublicVerificationPage: React.FC<PublicVerificationPageProps> = ({
   requests,
   onSubmitResponse,
 }) => {
-  // Find matching request by token (fallback to active request so test tokens work seamlessly)
+  // Local state for matched request fetched from Supabase DB or props
+  const [activeRequest, setActiveRequest] = useState<BGVRequest | null>(() => {
+    return (
+      requests.find((r) => r.token === token) ||
+      requests.find((r) => r.status === 'Sent' || r.status === 'Opened') ||
+      requests[0] ||
+      null
+    );
+  });
+
+  // Always fetch fresh state from Supabase by token and mark as 'Opened' in real-time
+  useEffect(() => {
+    let isMounted = true;
+    const syncFromDB = async () => {
+      if (token) {
+        const dbReq = await fetchRequestByToken(token);
+        if (isMounted && dbReq) {
+          setActiveRequest(dbReq);
+          // If status is still 'Sent', update DB to 'Opened'
+          if (dbReq.status === 'Sent') {
+            const opened = await markRequestAsOpened(token);
+            if (isMounted && opened) {
+              setActiveRequest(opened);
+            }
+          }
+        }
+      }
+    };
+    syncFromDB();
+    return () => {
+      isMounted = false;
+    };
+  }, [token]);
+
+  // Sync if requests prop updates
+  useEffect(() => {
+    if (!activeRequest && requests.length > 0) {
+      const match = requests.find((r) => r.token === token) || requests[0];
+      if (match) setActiveRequest(match);
+    }
+  }, [requests, activeRequest, token]);
+
   const matchedRequest =
+    activeRequest ||
     requests.find((r) => r.token === token) ||
     requests.find((r) => r.status === 'Sent' || r.status === 'Opened') ||
     requests[0];
@@ -218,7 +265,7 @@ export const PublicVerificationPage: React.FC<PublicVerificationPageProps> = ({
       ? Number((validScores.reduce((a, b) => a + b, 0) / validScores.length).toFixed(1))
       : null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!matchedRequest) return;
     if (!verifierName || !verifierDesignation || !verifierEmail) {
@@ -236,7 +283,7 @@ export const PublicVerificationPage: React.FC<PublicVerificationPageProps> = ({
       ' ' +
       now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-    onSubmitResponse(matchedRequest.id, {
+    const responsePayload: NonNullable<BGVRequest['responseDetails']> = {
       confirmed,
       rehireEligibility,
       remarks: remarks || (confirmed ? 'Employment details verified as accurate.' : 'Discrepancy noted in records.'),
@@ -254,7 +301,23 @@ export const PublicVerificationPage: React.FC<PublicVerificationPageProps> = ({
         comment: behaviouralComment,
         averageScore,
       },
-    });
+    };
+
+    // 1. Submit directly to Supabase DB in real time
+    await submitVerificationResponse(matchedRequest.id, responsePayload);
+
+    // 2. Notify parent listener & update local state
+    onSubmitResponse(matchedRequest.id, responsePayload);
+    setActiveRequest((prev) =>
+      prev
+        ? {
+            ...prev,
+            status: 'Responded',
+            respondedAt: timeFormatted,
+            responseDetails: responsePayload,
+          }
+        : null
+    );
 
     setIsSubmitted(true);
     confetti({
