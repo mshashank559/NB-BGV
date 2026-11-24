@@ -37,25 +37,25 @@ function requestToRow(req: BGVRequest) {
     id: req.id,
     token: req.token,
     candidate_name: req.candidateName,
-    position_offered: req.positionOffered,
-    department: req.department,
-    previous_employer: req.previousEmployer,
-    previous_email: req.previousEmail,
-    employment_start_date: req.employmentStartDate,
-    employment_end_date: req.employmentEndDate,
-    designation: req.designation,
-    ctc: req.ctc,
-    reason_for_leaving: req.reasonForLeaving,
-    notice_period: req.noticePeriod,
-    experience_letter_name: req.experienceLetterName,
-    experience_letter_url: req.experienceLetterUrl,
-    status: req.status,
-    created_at: req.createdAt,
-    sent_at: req.sentAt,
-    opened_at: req.openedAt,
-    responded_at: req.respondedAt,
-    email_details: req.emailDetails,
-    response_details: req.responseDetails,
+    position_offered: req.positionOffered ?? null,
+    department: req.department ?? null,
+    previous_employer: req.previousEmployer ?? null,
+    previous_email: req.previousEmail ?? null,
+    employment_start_date: req.employmentStartDate ?? null,
+    employment_end_date: req.employmentEndDate ?? null,
+    designation: req.designation ?? null,
+    ctc: req.ctc ?? '',
+    reason_for_leaving: req.reasonForLeaving ?? '',
+    notice_period: req.noticePeriod ?? 'Served',
+    experience_letter_name: req.experienceLetterName ?? null,
+    experience_letter_url: req.experienceLetterUrl ?? null,
+    status: req.status || 'Draft',
+    created_at: req.createdAt ?? new Date().toISOString(),
+    sent_at: req.sentAt ?? null,
+    opened_at: req.openedAt ?? null,
+    responded_at: req.respondedAt ?? null,
+    email_details: req.emailDetails ?? null,
+    response_details: req.responseDetails ?? null,
   };
 }
 
@@ -79,12 +79,14 @@ export function setStoredRequests(requests: BGVRequest[]): void {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(requests));
     window.dispatchEvent(new Event('bgv-requests-updated'));
 
-    // 1. Sync with server local file fallback
-    fetch('/api/requests', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(requests),
-    }).catch(() => {});
+    // 1. Sync with server local file fallback (only during local Vite dev)
+    if (import.meta.env.DEV) {
+      fetch('/api/requests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requests),
+      }).catch(() => {});
+    }
 
     // 2. Sync with Supabase PostgreSQL in background
     if (requests.length > 0) {
