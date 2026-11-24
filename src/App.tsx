@@ -69,27 +69,18 @@ export function App() {
   useEffect(() => {
     // 1. Initial local sync & background Supabase fetch
     const stored = getStoredRequests();
-    const cleanStored = stored.filter(
-      (r) => !['NB-BGV-1001', 'NB-BGV-1002', 'NB-BGV-1003', 'NB-BGV-1004', 'NB-BGV-1005'].includes(r.id)
-    );
-    setRequests(cleanStored);
+    setRequests(stored);
 
     syncFromSupabase().then((fromSupabase) => {
       if (fromSupabase) {
-        const cleanFromSupabase = fromSupabase.filter(
-          (r) => !['NB-BGV-1001', 'NB-BGV-1002', 'NB-BGV-1003', 'NB-BGV-1004', 'NB-BGV-1005'].includes(r.id)
-        );
-        setRequests(cleanFromSupabase);
+        setRequests(fromSupabase);
       }
     });
 
     // 2. Setup Supabase Realtime listener for requests and HR users
     const unsubscribeRealtime = subscribeToSupabaseRealtime(
       (updated) => {
-        const cleanUpdated = updated.filter(
-          (r) => !['NB-BGV-1001', 'NB-BGV-1002', 'NB-BGV-1003', 'NB-BGV-1004', 'NB-BGV-1005'].includes(r.id)
-        );
-        setRequests(cleanUpdated);
+        setRequests(updated);
       },
       (updatedUsers) => {
         setUsers(updatedUsers.length > 0 ? updatedUsers : initialUsers);

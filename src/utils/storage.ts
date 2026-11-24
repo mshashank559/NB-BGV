@@ -65,15 +65,7 @@ export function getStoredRequests(): BGVRequest[] {
     if (raw) {
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed)) {
-        // Purge legacy mock data
-        const filtered = parsed.filter(
-          (r) =>
-            !['NB-BGV-1001', 'NB-BGV-1002', 'NB-BGV-1003', 'NB-BGV-1004', 'NB-BGV-1005'].includes(r.id)
-        );
-        if (filtered.length !== parsed.length) {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
-        }
-        return filtered;
+        return parsed;
       }
     }
   } catch (e) {
@@ -119,11 +111,7 @@ export async function syncFromSupabase(): Promise<BGVRequest[] | null> {
       .order('created_at', { ascending: false });
 
     if (!error && Array.isArray(data)) {
-      const cleanData = data.filter(
-        (r) =>
-          !['NB-BGV-1001', 'NB-BGV-1002', 'NB-BGV-1003', 'NB-BGV-1004', 'NB-BGV-1005'].includes(r.id)
-      );
-      const converted = cleanData.map(rowToRequest);
+      const converted = data.map(rowToRequest);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(converted));
       window.dispatchEvent(new Event('bgv-requests-updated'));
       return converted;

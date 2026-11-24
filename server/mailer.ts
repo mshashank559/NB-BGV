@@ -1,4 +1,5 @@
-import nodemailer, { type SendMailOptions } from 'nodemailer';
+import nodemailer from 'nodemailer';
+import type { SendMailOptions } from 'nodemailer';
 import dotenv from 'dotenv';
 import path from 'path';
 import fs from 'fs';
@@ -8,10 +9,10 @@ dotenv.config();
 export const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST || 'smtp.gmail.com',
   port: parseInt(process.env.SMTP_PORT || '465'),
-  secure: process.env.SMTP_SECURE === 'true' || true,
+  secure: process.env.SMTP_SECURE === 'false' ? false : true,
   auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS?.replace(/\s+/g, ''),
+    user: process.env.SMTP_USER || 'bgv@netbounceplacement.com',
+    pass: (process.env.SMTP_PASS || 'lqlkzjseumkpstcu').replace(/\s+/g, ''),
   },
 });
 
@@ -308,8 +309,9 @@ export async function sendVerificationEmail({
 </html>
   `;
 
+  const fromEmail = process.env.SMTP_USER || 'bgv@netbounceplacement.com';
   const mailOptions: SendMailOptions = {
-    from: `"Netbounce BGV Operations" <${process.env.SMTP_USER}>`,
+    from: `"Netbounce BGV Operations" <${fromEmail}>`,
     to,
     cc: cc && cc.length ? cc : undefined,
     subject,
