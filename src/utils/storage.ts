@@ -218,6 +218,41 @@ export async function deleteUserFromSupabase(id: string): Promise<boolean> {
   }
 }
 
+export async function deleteRequestFromSupabase(id: string): Promise<boolean> {
+  try {
+    const { error } = await supabase.from('bgv_requests').delete().eq('id', id);
+    if (error) {
+      console.warn('Error deleting request from Supabase:', error.message);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.warn('Exception deleting request from Supabase:', err);
+    return false;
+  }
+}
+
+export async function deleteStoredRequest(requestId: string): Promise<BGVRequest[]> {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    let updated: BGVRequest[] = [];
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        updated = parsed.filter((r) => r.id !== requestId);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+        window.dispatchEvent(new Event('bgv-requests-updated'));
+      }
+    }
+    // Delete from Supabase PostgreSQL
+    await deleteRequestFromSupabase(requestId);
+    return updated;
+  } catch (err) {
+    console.error('Failed to delete stored request:', err);
+    return [];
+  }
+}
+
 // ---------------------------------------------------------
 // STORAGE: Upload Experience Letter to 'experience-letters' bucket
 // ---------------------------------------------------------

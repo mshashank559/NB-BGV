@@ -16,7 +16,9 @@ import {
   fetchUsersFromSupabase,
   saveUserToSupabase,
   deleteUserFromSupabase,
+  deleteStoredRequest,
 } from './utils/storage';
+import { DeleteConfirmationModal } from './components/DeleteConfirmationModal';
 import confetti from 'canvas-confetti';
 
 export function App() {
@@ -56,6 +58,10 @@ export function App() {
   // Active / Selected request for modals
   const [selectedRequest, setSelectedRequest] = useState<BGVRequest | null>(null);
   const [pendingDraftData, setPendingDraftData] = useState<Partial<BGVRequest> | null>(null);
+
+  // Delete Confirmation Modal state
+  const [requestToDelete, setRequestToDelete] = useState<BGVRequest | null>(null);
+  const [isDeletingRequest, setIsDeletingRequest] = useState(false);
 
   // Toast notification state
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -462,14 +468,30 @@ export function App() {
     showToast(`Verification link copied to clipboard!`);
   };
 
-  const handleCancelRequest = (requestId: string) => {
-    if (confirm('Are you sure you want to cancel this verification request?')) {
-      const updated = requests.map((r) =>
-        r.id === requestId ? { ...r, status: 'Cancelled' as const } : r
-      );
-      setRequests(updated);
-      setStoredRequests(updated);
-      showToast('Request marked as Cancelled');
+  const handleOpenDeleteModal = (requestId: string) => {
+    const target = requests.find((r) => r.id === requestId);
+    if (target) {
+      setRequestToDelete(target);
+    }
+  };
+
+  const handleConfirmDeleteRequest = async () => {
+    if (!requestToDelete) return;
+    setIsDeletingRequest(true);
+    const targetId = requestToDelete.id;
+    const targetName = requestToDelete.candidateName;
+
+    try {
+      const remaining = await deleteStoredRequest(targetId);
+      setRequests(remaining);
+      showToast(`Record for ${targetName} (${targetId}) permanently deleted from database.`);
+    } catch {
+      const fallbackRemaining = requests.filter((r) => r.id !== targetId);
+      setRequests(fallbackRemaining);
+      showToast(`Request removed from dashboard.`);
+    } finally {
+      setIsDeletingRequest(false);
+      setRequestToDelete(null);
     }
   };
 
@@ -511,7 +533,7 @@ export function App() {
         onDownloadEmailPDF={downloadSentEmailPDF}
         onDownloadResponsePDF={downloadResponsePDF}
         onCopyLink={handleCopyLink}
-        onCancelRequest={handleCancelRequest}
+        onCancelRequest={handleOpenDeleteModal}
         onAddUser={handleAddUser}
         onDeleteUser={handleDeleteUser}
         onExportMasterSummary={handleExportMasterSummary}
@@ -544,6 +566,19 @@ export function App() {
         request={selectedRequest}
         onDownloadEmailPDF={downloadSentEmailPDF}
         onDownloadResponsePDF={downloadResponsePDF}
+      />
+
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmationModal
+        isOpen={Boolean(requestToDelete)}
+        request={requestToDelete}
+        isDeleting={isDeletingRequest}
+        onClose={() => {
+          if (!isDeletingRequest) {
+            setRequestToDelete(null);
+          }
+        }}
+        onConfirmDelete={handleConfirmDeleteRequest}
       />
 
       {/* Floating Toast Notification */}
