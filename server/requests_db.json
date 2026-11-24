@@ -1,0 +1,172 @@
+[
+  {
+    "id": "NB-BGV-1001",
+    "token": "8f4c29a1e0b53d7199c824ba014ef9c5d8a23e1b7c4d5f6a9e0b1c2d3e4f5a6b",
+    "candidateName": "Rohan Sharma",
+    "positionOffered": "Senior Backend Engineer",
+    "department": "Engineering > Platform",
+    "previousEmployer": "Infosys Technologies",
+    "previousEmail": "hr.verification@infosys.com",
+    "employmentStartDate": "2021-04-12",
+    "employmentEndDate": "2024-02-28",
+    "designation": "Technology Analyst",
+    "ctc": "₹14,50,000",
+    "reasonForLeaving": "Career advancement & growth",
+    "noticePeriod": "Served",
+    "experienceLetterName": "Rohan_Experience_Letter.pdf",
+    "status": "Responded",
+    "createdAt": "2026-03-01 10:15 AM",
+    "sentAt": "2026-03-01 11:30 AM",
+    "openedAt": "2026-03-01 02:45 PM",
+    "respondedAt": "2026-03-02 04:10 PM",
+    "emailDetails": {
+      "to": "hr.verification@infosys.com",
+      "cc": [
+        "compliance@infosys.com",
+        "hr@netbounceplacement.com"
+      ],
+      "subject": "Employment Verification Request for Rohan Sharma | 11:30 AM, 01 Mar 2026 | Netbounce",
+      "sentDate": "2026-03-01 11:30 AM",
+      "personalNote": "Kindly verify at the earliest as onboarding is scheduled for next Monday."
+    },
+    "responseDetails": {
+      "confirmed": true,
+      "rehireEligibility": "Eligible",
+      "remarks": "Candidate had excellent conduct, completed knowledge transfer seamlessly, and left on positive terms.",
+      "verifierName": "Pooja Kulkarni",
+      "verifierDesignation": "Lead HR Operations",
+      "verifierEmail": "pooja.k@infosys.com",
+      "verifierPhone": "+91 98201 54321",
+      "submittedAt": "2026-03-02 04:10 PM",
+      "behaviouralRatings": {
+        "q1PerformanceUnderPressure": 5,
+        "q2ProblemSolving": 5,
+        "q3TeamworkCommunication": 4,
+        "q4ReceivingFeedback": 5,
+        "q5OwnershipReliability": 5,
+        "averageScore": 4.8,
+        "comment": "Handled a major production crisis during peak festival sale with extreme diligence and ownership."
+      }
+    }
+  },
+  {
+    "id": "NB-BGV-1002",
+    "token": "a7b3c9d1e2f458690123456789abcdef0123456789abcdef0123456789abcdef",
+    "candidateName": "Ananya Verma",
+    "positionOffered": "Product Designer",
+    "department": "Product & UX",
+    "previousEmployer": "Wipro Digital",
+    "previousEmail": "bgv-team@wipro.com",
+    "employmentStartDate": "2022-07-01",
+    "employmentEndDate": "2024-11-15",
+    "designation": "UI/UX Designer",
+    "ctc": "₹11,00,000",
+    "reasonForLeaving": "Relocation to Gurgaon",
+    "noticePeriod": "Served",
+    "experienceLetterName": "Ananya_Verma_Relieving.pdf",
+    "status": "Responded",
+    "createdAt": "2026-03-02 09:40 AM",
+    "sentAt": "2026-03-02 10:00 AM",
+    "openedAt": "2026-03-02 01:20 PM",
+    "emailDetails": {
+      "to": "bgv-team@wipro.com",
+      "cc": [
+        "hr@netbounceplacement.com"
+      ],
+      "subject": "Employment Verification Request for Ananya Verma | 10:00 AM, 02 Mar 2026 | Netbounce",
+      "sentDate": "2026-03-02 10:00 AM"
+    },
+    "respondedAt": "24 Nov 2026 08:54 pm",
+    "responseDetails": {
+      "confirmed": true,
+      "rehireEligibility": "Eligible",
+      "remarks": "Employment details verified as accurate.",
+      "verifierName": "Pooja Kulkarni",
+      "verifierDesignation": "Lead HR Operations",
+      "verifierEmail": "bgv-team@wipro.com",
+      "verifierPhone": "+91 98201 54321",
+      "submittedAt": "24 Nov 2026 08:54 pm",
+      "behaviouralRatings": {
+        "q1PerformanceUnderPressure": 4,
+        "q2ProblemSolving": 3,
+        "q3TeamworkCommunication": 5,
+        "q4ReceivingFeedback": 4,
+        "q5OwnershipReliability": 5,
+        "comment": "Demonstrated high ownership on tight deliverable deadlines and managed stakeholder expectations effectively.",
+        "averageScore": 4.2
+      }
+    }
+  },
+  {
+    "id": "NB-BGV-1003",
+    "token": "c5d8e1f2a3b405968778695041322110abcdefabcdefabcdefabcdefabcdef01",
+    "candidateName": "Vikramaditya Rao",
+    "positionOffered": "Lead DevOps Architect",
+    "department": "Cloud Infrastructure",
+    "previousEmployer": "Accenture India",
+    "previousEmail": "india.verifications@accenture.com",
+    "employmentStartDate": "2019-01-15",
+    "employmentEndDate": "2023-12-31",
+    "designation": "Team Lead - Cloud Services",
+    "ctc": "₹22,00,000",
+    "reasonForLeaving": "Higher responsibilities & compensation",
+    "noticePeriod": "Served",
+    "experienceLetterName": "Vikram_Accenture_Exp.pdf",
+    "status": "Sent",
+    "createdAt": "2026-03-03 11:00 AM",
+    "sentAt": "2026-03-03 11:15 AM",
+    "emailDetails": {
+      "to": "india.verifications@accenture.com",
+      "cc": [
+        "hr@netbounceplacement.com"
+      ],
+      "subject": "Employment Verification Request for Vikramaditya Rao | 11:15 AM, 03 Mar 2026 | Netbounce",
+      "sentDate": "2026-03-03 11:15 AM"
+    }
+  },
+  {
+    "id": "NB-BGV-1004",
+    "token": "b1c2d3e4f5a607182930415263748596aabbccddeeff00112233445566778899",
+    "candidateName": "Priya Sundaram",
+    "positionOffered": "Inside Sales Specialist",
+    "department": "Business Development",
+    "previousEmployer": "Zomato Media",
+    "previousEmail": "peopleops@zomato.com",
+    "employmentStartDate": "2022-03-10",
+    "employmentEndDate": "2024-05-30",
+    "designation": "Senior Account Executive",
+    "ctc": "₹8,50,000",
+    "reasonForLeaving": "Personal reasons",
+    "noticePeriod": "Served",
+    "status": "Draft",
+    "createdAt": "2026-03-03 03:20 PM"
+  },
+  {
+    "id": "NB-BGV-1005",
+    "token": "99887766554433221100ffeeddccbbaa09182736455463728190abcdef123456",
+    "candidateName": "Kunal Deshmukh",
+    "positionOffered": "Financial Analyst",
+    "department": "Finance & Accounts",
+    "previousEmployer": "TCS (Tata Consultancy Services)",
+    "previousEmail": "corporate.bgv@tcs.com",
+    "employmentStartDate": "2020-08-01",
+    "employmentEndDate": "2023-01-31",
+    "designation": "Systems Engineer - Finance Domain",
+    "ctc": "₹9,80,000",
+    "reasonForLeaving": "Resignation",
+    "noticePeriod": "Served",
+    "experienceLetterName": "Kunal_TCS_Relieving.pdf",
+    "status": "Expired",
+    "createdAt": "2026-01-15 02:00 PM",
+    "sentAt": "2026-01-15 02:30 PM",
+    "openedAt": "2026-01-18 11:00 AM",
+    "emailDetails": {
+      "to": "corporate.bgv@tcs.com",
+      "cc": [
+        "hr@netbounceplacement.com"
+      ],
+      "subject": "Employment Verification Request for Kunal Deshmukh | 02:30 PM, 15 Jan 2026 | Netbounce",
+      "sentDate": "2026-01-15 02:30 PM"
+    }
+  }
+]
