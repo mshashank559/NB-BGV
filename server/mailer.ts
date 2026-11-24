@@ -1,8 +1,6 @@
 import nodemailer from 'nodemailer';
 import type { SendMailOptions } from 'nodemailer';
 import dotenv from 'dotenv';
-import path from 'path';
-import fs from 'fs';
 
 dotenv.config();
 
@@ -43,9 +41,6 @@ export async function sendVerificationEmail({
   verificationLink,
   personalNote,
 }: SendVerificationEmailParams) {
-  const logoPath = path.resolve(process.cwd(), 'public', 'netbounce-logo.png');
-  const hasLogo = fs.existsSync(logoPath);
-
   const htmlContent = `
 <!DOCTYPE html>
 <html lang="en">
@@ -228,11 +223,7 @@ export async function sendVerificationEmail({
   <div class="wrapper">
     <div class="header-dark" style="background-color: #3876ba; background-image: url('https://images.unsplash.com/photo-1513002749550-c59d786b8e6c?w=1200&auto=format&fit=crop&q=80'); background-size: cover; background-position: center; padding: 38px 24px; text-align: center; border-bottom: 3px solid #8cbfe8; border-radius: 24px 24px 0 0;">
       <div class="logo-container" style="margin-bottom: 16px; text-align: center;">
-        ${
-          hasLogo
-            ? `<img src="cid:netbounce_logo" alt="NETBOUNCE PLACEMENT LLC" class="logo-img" style="height: 52px; max-width: 320px; width: auto; display: inline-block; vertical-align: middle; filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.45));" />`
-            : `<h1 style="color: #ffffff; margin: 0; font-size: 20px; font-weight: 900; letter-spacing: -0.02em; text-shadow: 0 2px 8px rgba(0,0,0,0.5);">NETBOUNCE PLACEMENT LLC</h1>`
-        }
+        <img src="https://bgv.netbounceplacement.com/netbounce-logo.png" alt="NETBOUNCE PLACEMENT LLC" class="logo-img" style="height: 52px; max-width: 320px; width: auto; display: inline-block; vertical-align: middle; filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.45));" />
       </div>
       <div>
         <span class="badge" style="display: inline-block; padding: 7px 18px; background: rgba(255, 255, 255, 0.28); border: 1.5px solid rgba(255, 255, 255, 0.65); border-radius: 20px; font-size: 11px; font-weight: 800; letter-spacing: 0.08em; color: #ffffff; text-transform: uppercase; text-shadow: 0 1px 4px rgba(0, 0, 0, 0.35); box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);">Official Employment Verification Request</span>
@@ -316,15 +307,6 @@ export async function sendVerificationEmail({
     cc: cc && cc.length ? cc : undefined,
     subject,
     html: htmlContent,
-    attachments: hasLogo
-      ? [
-          {
-            filename: 'netbounce-logo.png',
-            path: logoPath,
-            cid: 'netbounce_logo',
-          },
-        ]
-      : undefined,
   };
 
   const info = await transporter.sendMail(mailOptions);
